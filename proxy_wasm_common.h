@@ -97,7 +97,8 @@ enum class WasmBufferType : int32_t {
   VmConfiguration = 6,       // Immutable
   PluginConfiguration = 7,   // Immutable
   CallData = 8,              // Immutable
-  MAX = 8,
+  RedisCallResponse = 9,     // Immutable
+  MAX = 9,
 };
 enum class WasmBufferFlags : int32_t {
   // These must be powers of 2.

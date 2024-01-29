@@ -307,6 +307,8 @@ public:
       std::function<void(uint32_t, size_t, uint32_t)>; // headers, body_size, trailers
   using GrpcSimpleCallCallback = std::function<void(GrpcStatus status, size_t body_size)>;
 
+  using RedisCallCallback = std::function<void(RedisStatus status, size_t result_size)>;
+
 private:
   uint32_t id_;
 };
@@ -347,7 +349,12 @@ public:
   virtual void onGrpcReceiveTrailingMetadata(uint32_t token, uint32_t trailers);
   virtual void onGrpcReceive(uint32_t token, size_t body_size);
   virtual void onGrpcClose(uint32_t token, GrpcStatus status);
+  virtual void onRedisCallResponse(uint32_t token, RedisStatus status, size_t response_size);
 
+  WasmResult redisInit(std::string_view service, std::string_view username,
+                       std::string_view password, uint32_t timeout_milliseconds);
+  WasmResult redisCall(std::string_view service, std::string_view query,
+                       RedisCallCallback callback);
   // Default high level HTTP/gRPC interface. NB: overriding the low level
   // interface will disable this interface. Returns false on setup error.
   WasmResult httpCall(std::string_view uri, const HeaderStringPairs &request_headers,
@@ -436,6 +443,7 @@ private:
   std::unordered_map<uint32_t, GrpcSimpleCallCallback> simple_grpc_calls_;
   std::unordered_map<uint32_t, std::unique_ptr<GrpcCallHandlerBase>> grpc_calls_;
   std::unordered_map<uint32_t, std::unique_ptr<GrpcStreamHandlerBase>> grpc_streams_;
+  std::unordered_map<uint32_t, RedisCallCallback> redis_calls_;
 };
 
 RootContext *getRoot(std::string_view root_id);
@@ -1386,6 +1394,32 @@ inline WasmResult grpcClose(uint32_t token) { return proxy_grpc_close(token); }
 
 inline WasmResult grpcSend(uint32_t token, std::string_view message, bool end_stream) {
   return proxy_grpc_send(token, message.data(), message.size(), end_stream ? 1 : 0);
+}
+
+inline WasmResult RootContext::redisInit(std::string_view service, std::string_view username,
+                                         std::string_view password, uint32_t timeout_milliseconds) {
+  return proxy_redis_init(service.data(), service.size(), username.data(), username.size(),
+                          password.data(), password.size(), timeout_milliseconds);
+}
+
+inline WasmResult RootContext::redisCall(std::string_view service, std::string_view query,
+                                         RedisCallCallback callback) {
+  uint32_t token = 0;
+  auto result =
+      proxy_redis_call(service.data(), service.size(), query.data(), query.size(), &token);
+  if (result == WasmResult::Ok) {
+    redis_calls_[token] = std::move(callback);
+  }
+  return result;
+}
+
+inline void RootContext::onRedisCallResponse(uint32_t token, RedisStatus status,
+                                             size_t response_size) {
+  auto it = redis_calls_.find(token);
+  if (it != redis_calls_.end()) {
+    it->second(status, response_size);
+    redis_calls_.erase(token);
+  }
 }
 
 inline WasmResult RootContext::httpCall(std::string_view uri,

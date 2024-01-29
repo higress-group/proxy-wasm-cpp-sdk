@@ -40,6 +40,10 @@ enum class FilterDataStatus : int32_t {
   StopIterationAndWatermark = 2,
   StopIterationNoBuffer = 3
 };
+enum class RedisStatus : int32_t {
+  Ok = 0,
+  NetworkError = 1,
+};
 enum class GrpcStatus : int32_t {
   Ok = 0,
   Canceled = 1,
