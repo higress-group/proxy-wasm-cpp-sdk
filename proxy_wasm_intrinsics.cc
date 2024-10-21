@@ -17,7 +17,11 @@
 #include "proxy_wasm_intrinsics.h"
 
 // Required Proxy-Wasm ABI version.
+#if defined(PROXY_WASM_0_2_100)
+extern "C" PROXY_WASM_KEEPALIVE void proxy_abi_version_0_2_100() {}
+#else
 extern "C" PROXY_WASM_KEEPALIVE void proxy_abi_version_0_2_1() {}
+#endif
 
 static std::unordered_map<std::string, RootFactory> *root_factories = nullptr;
 static std::unordered_map<std::string, ContextFactory> *context_factories = nullptr;
