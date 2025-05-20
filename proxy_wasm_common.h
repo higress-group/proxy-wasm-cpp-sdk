@@ -121,7 +121,8 @@ enum class WasmBufferType : int32_t {
   PluginConfiguration = 7,
   // Foreign function call argument data. Immutable.
   CallData = 8,
-  MAX = 8,
+  RedisCallResponse = 9, // Immutable
+  MAX = 9,
 };
 
 // Flags values for `getBufferStatus` hostcall.

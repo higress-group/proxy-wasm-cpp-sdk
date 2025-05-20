@@ -118,12 +118,23 @@ extern "C" WasmResult proxy_get_buffer_status(WasmBufferType type, size_t *lengt
 extern "C" WasmResult proxy_set_buffer_bytes(WasmBufferType type, uint32_t start, uint32_t length,
                                              const char *ptr, size_t size);
 
+// Redis
+extern "C" WasmResult proxy_redis_init(const char *service_ptr, size_t service_size,
+                                       const char *username_ptr, size_t username_size,
+                                       const char *password_ptr, size_t password_size,
+                                       uint32_t timeout_milliseconds);
+
+extern "C" WasmResult proxy_redis_call(const char *service_ptr, size_t service_size,
+                                       const char *body_ptr, size_t body_size,
+                                       uint32_t *token_ptr);
+
 // HTTP
 extern "C" WasmResult proxy_http_call(const char *uri_ptr, size_t uri_size, void *header_pairs_ptr,
                                       size_t header_pairs_size, const char *body_ptr,
                                       size_t body_size, void *trailer_pairs_ptr,
                                       size_t trailer_pairs_size, uint32_t timeout_milliseconds,
                                       uint32_t *token_ptr);
+
 // gRPC
 extern "C" WasmResult proxy_grpc_call(const char *service_ptr, size_t service_size,
                                       const char *service_name_ptr, size_t service_name_size,

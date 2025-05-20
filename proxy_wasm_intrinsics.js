@@ -44,6 +44,8 @@ mergeInto(LibraryManager.library, {
   proxy_get_buffer_status: function() {},
   proxy_set_buffer_bytes: function() {},
   proxy_http_call: function() {},
+  proxy_redis_init: function() {},
+  proxy_redis_call: function() {},
   proxy_define_metric: function() {},
   proxy_increment_metric: function() {},
   proxy_record_metric: function() {},

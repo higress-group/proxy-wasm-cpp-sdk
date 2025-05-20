@@ -95,6 +95,11 @@ enum class FilterDataStatus : int32_t {
   StopIterationNoBuffer = 3
 };
 
+enum class RedisStatus : int32_t {
+  Ok = 0,
+  NetworkError = 1,
+};
+
 // gRPC status codes.
 enum class GrpcStatus : int32_t {
   Ok = 0,

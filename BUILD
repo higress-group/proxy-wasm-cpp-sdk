@@ -45,6 +45,22 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "proxy_wasm_intrinsics_higress",
+    srcs = [
+        "proxy_wasm_intrinsics.cc",
+    ],
+    hdrs = [
+        "proxy_wasm_api.h",
+        "proxy_wasm_common.h",
+        "proxy_wasm_enums.h",
+        "proxy_wasm_externs.h",
+        "proxy_wasm_intrinsics.h",
+    ],
+    copts = ["-std=c++17", "-DPROXY_WASM_0_2_100"],
+    visibility = ["//visibility:public"],
+)
+
 cc_proto_library(
     name = "proxy_wasm_intrinsics_cc_proto",
     deps = [":proxy_wasm_intrinsics_proto"],
